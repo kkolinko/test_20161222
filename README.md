@@ -1,92 +1,99 @@
+# test_20161222
+Sample configuration to reproduce crash in mod_proxy_ajp in HTTPD 2.4.25.
 
-1. As said at [http://www.apachelounge.com/download/]:
+License: Apache License 2.0<br>
+See files Apache24/LICENSE.txt, Tomcat7/LICENSE
 
-Be sure that you have installed the latest C++ Redistributable for Visual
-Studio 2015: vc_redist_x64/86.exe.
+## Prerequisites
 
--> https://www.microsoft.com/en-us/download/details.aspx?id=53840
-(Microsoft Visual C++ 2015 Redistributable Update 3)
+ 1. As written at [http://www.apachelounge.com/download/]:
 
+    >   Be sure that you have installed the latest C++ Redistributable for Visual
+    >   Studio 2015: vc_redist_x64/86.exe.
 
-2. Tomcat needs a Java Runtime.
+    https://www.microsoft.com/en-us/download/details.aspx?id=53840
+    (Microsoft Visual C++ 2015 Redistributable Update 3)
 
-I am using Oracle Java 8 JRE (8u112), 32-bit
+ 2. Tomcat needs a Java Runtime.
 
+    I am using Oracle Java 8 JRE (8u112), 32-bit
 
-3. Software:
+## Software
 
-/Apache24
-  httpd-2.4.25-win32-VC14.zip
-  from http://www.apachelounge.com/download/
+Software that is used here
 
-  minus documentation, include headers, libraries
+ *  Apache24
 
-/Tomcat7
-  apache-tomcat-7.0.73.zip
-  from http://tomcat.apache.org/download-70.cgi
+    `httpd-2.4.25-win32-VC14.zip`
+    from http://www.apachelounge.com/download/
 
-4. In Apache24/conf/*, Apache24/conf/extra/*
+    minus documentation, include headers, libraries
 
-Replace all locations of "C:/" with actual path of this directory, e.g. D:/test_20161222/
+ *  Tomcat7
+ 
+    `apache-tomcat-7.0.73.zip`
+    from http://tomcat.apache.org/download-70.cgi
 
-5. In Apache24/conf/httpd.conf
+## Configuration
 
-Replace the following line:
+ 1. In `Apache24/conf/*`, `Apache24/conf/extra/*`
 
-Listen 80
+    Replace all locations of `C:/` with actual path of this directory, e.g. `D:/test_20161222/`
 
-with two lines:
+ 2. In `Apache24/conf/httpd.conf`
 
-Listen 127.0.0.1:9090
-ServerName localhost
+    Replace the following line:
 
-to listen for local connections only, on port 9090
-and to configure ServerName.
+        Listen 80
 
-6. In Tomcat7/conf/server.xml
+    with two lines:
 
-In <Connector> elements add address="127.0.0.1"
-to listen for local connections only.
+        Listen 127.0.0.1:9090
+        ServerName localhost
 
-7. In Apache24/conf/httpd.conf
+    to listen for local connections only, on port 9090 and to configure ServerName.
 
-Uncomment the following lines
-to enable modules mod_proxy and mod_proxy_ajp:
+ 3. In Tomcat7/conf/server.xml
 
-LoadModule proxy_module modules/mod_proxy.so
-LoadModule proxy_ajp_module modules/mod_proxy_ajp.so
+    In <Connector> elements add `address="127.0.0.1"`
+    to listen for local connections only.
 
-8. In Apache24/conf/httpd.conf
+ 4. In Apache24/conf/httpd.conf
 
-Add the following lines to the end of the file
-to configure proxying for examples web application.
+    Uncomment the following lines
+    to enable modules mod_proxy and mod_proxy_ajp:
 
-<IfModule mod_proxy.c>
-    ProxyRequests off
-    <Location /examples>
-        ProxyPass ajp://127.0.0.1:8009/examples
-    </Location>
-</IfModule>
+        LoadModule proxy_module modules/mod_proxy.so
+        LoadModule proxy_ajp_module modules/mod_proxy_ajp.so
 
-9. Start the servers:
+    Add the following lines to the end of the file
+    to configure proxying for examples web application.
 
-Apache HTTPD:
+    <IfModule mod_proxy.c>
+        ProxyRequests off
+        <Location /examples>
+            ProxyPass ajp://127.0.0.1:8009/examples
+        </Location>
+    </IfModule>
 
-start "Apache" Apache24\bin\httpd.exe -w
+ 5. Start the servers:
 
+    See `run.bat`.
 
-Apache Tomcat:
+    Apache HTTPD:
 
-set CATALINA_HOME=Tomcat7
-set "JAVA_HOME=C:\Program Files (x86)\Java\jre1.8.0_112"
-Tomcat7\bin\startup.bat
+        start "Apache" Apache24\bin\httpd.exe -w
 
+    Apache Tomcat:
 
-10. Start a web browser and try browsing the examples web application
+        set CATALINA_HOME=Tomcat7
+        set "JAVA_HOME=C:\Program Files (x86)\Java\jre1.8.0_112"
+        Tomcat7\bin\startup.bat
 
-http://127.0.0.1:9090/examples/
+ 6. Start a web browser and try browsing the examples web application
 
-Visiting the root page and refreshing it (F5) is enough to trigger the issue.
+        http://127.0.0.1:9090/examples/
 
-11. Stop servers by closing their console windows (Ctrl+C).
+    Visiting the root page and refreshing it (F5) is enough to trigger the issue.
 
+ 7. Stop servers by closing their console windows (Ctrl+C).
