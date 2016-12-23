@@ -1,0 +1,4 @@
+Apache24/logs/*.log
+Apache24/logs/*.pid
+Tomcat7/logs/*.log
+Tomcat7/logs/*.txt
